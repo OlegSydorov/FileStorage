@@ -1,0 +1,127 @@
+﻿<Page x:Class="FileStorage_Client.Rule2"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:FileStorage_Client"
+      mc:Ignorable="d" 
+      d:DesignHeight="450" d:DesignWidth="800"
+      Title="Rule2" ShowsNavigationUI="False">
+
+    <Page.Resources>
+        <ControlTemplate x:Key="buttonTemplate" TargetType="{x:Type Button}">
+            <Grid>
+                <Rectangle x:Name="rect1" RadiusX="10" RadiusY="10" Stroke="White" Width="{TemplateBinding Button.Width}" Height="{TemplateBinding Button.Height}" StrokeThickness="2" Fill="{TemplateBinding Background}" >
+
+                    <Rectangle.Effect>
+                        <DropShadowEffect x:Name="shadow1" Opacity="1" BlurRadius="10"  Color="LightGray"/>
+                    </Rectangle.Effect>
+                </Rectangle>
+                <ContentPresenter Margin="{TemplateBinding Button.Padding}" HorizontalAlignment="Center" VerticalAlignment="Center" Content="{TemplateBinding Button.Content}"/>
+            </Grid>
+
+            <ControlTemplate.Triggers>
+
+
+                <Trigger Property="Button.IsPressed" Value="True">
+                    <Setter Property="RenderTransform">
+                        <Setter.Value>
+                            <ScaleTransform ScaleX="0.9" ScaleY="0.9"/>
+                        </Setter.Value>
+                    </Setter>
+                    <Setter Property="RenderTransformOrigin" Value=".5,.5"/>
+
+
+                    <Trigger.EnterActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation Storyboard.TargetName="shadow1"
+                                                 Storyboard.TargetProperty="BlurRadius"
+                                                 To="40" Duration="0:0:0.1"/>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </Trigger.EnterActions>
+
+                    <Trigger.ExitActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation Storyboard.TargetName="shadow1"
+                                                 Storyboard.TargetProperty="BlurRadius"
+                                                 To="10" Duration="0:0:0.1"/>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </Trigger.ExitActions>
+                </Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>
+
+        <Style x:Key="buttonStyle">
+            <Setter Property="Button.FontFamily" Value="Times"/>
+            <Setter Property="Button.FontSize" Value="30"/>
+            <Setter Property="Button.FontWeight" Value="Bold"/>
+            <!--<Setter Property="Button.Foreground" Value="DarkCyan"/>-->
+        </Style>
+
+        <Style x:Key="textBlockStyle">
+            <Setter Property="TextBlock.FontFamily" Value="Times" />
+            <Setter Property="TextBlock.FontSize" Value="35"/>
+            <Setter Property="TextBlock.FontWeight" Value="Bold"/>
+            <Setter Property="TextBlock.HorizontalAlignment" Value="Center"/>
+        </Style>
+
+        <Style x:Key="textBoxStyle">
+            <Setter Property="TextBox.FontFamily" Value="Times" />
+            <Setter Property="TextBox.FontSize" Value="20"/>
+            <Setter Property="TextBox.FontWeight" Value="Bold"/>
+            <Setter Property="TextBox.TextWrapping" Value="Wrap"/>
+            <Setter Property="TextBox.HorizontalContentAlignment" Value="Left"/>
+        </Style>
+    </Page.Resources>
+
+    <Grid >
+        <Border x:Name="mainBorder" BorderThickness="8"  CornerRadius="20" BorderBrush="Green" Background="White">
+            <Grid >
+
+                <Button x:Name="closeButton" Content="Close"  Background="Green" Foreground="White" Margin="350, 320, 300, 10"  Template="{StaticResource ResourceKey=buttonTemplate}" Style="{StaticResource buttonStyle}" Width="100" Height="60" Click="Close_ButtonClick" />
+
+                <TextBlock x:Name="headerTb" Background="Transparent" Margin="10,10,10,320" Foreground="Green" Text="File storage rules"  Style="{StaticResource textBlockStyle}"/>
+                <TextBox x:Name="txtTb" Background="Transparent" Margin="10,100,10,100" Foreground="Green" Text=""  Style="{StaticResource textBoxStyle}"/>
+
+                <Path x:Name="back" MouseDown="Back_MouseDown" Data="M 0,50 L 100, 0 L 100, 25 L 200, 25 L 200, 75 L 100, 75 L 100, 100 Z" Height="50"  Width="100" Stretch="Fill" Margin="50, 320, 600, 10" Fill="Green">
+                    <Path.Effect>
+                        <DropShadowEffect x:Name="shadowFB" ShadowDepth="5" BlurRadius="10" Color="{Binding ElementName=closeButton, Path=Foreground}"  RenderingBias="Performance"/>
+                    </Path.Effect>
+                    <Path.Triggers>
+                        <EventTrigger RoutedEvent="TextBlock.Loaded">
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <DoubleAnimation Storyboard.TargetName="shadowFB"
+                                                 Storyboard.TargetProperty="BlurRadius"                                             
+                                                 To="40" AutoReverse="true" RepeatBehavior="Forever" Duration="0:0:2"/>
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                    </Path.Triggers>
+                </Path>
+
+                <Path x:Name="forward" MouseDown="Forward_MouseDown" Data="M 0,25 L 100, 25 L 100, 0 L 200, 50 L 100, 100 L 100, 75 L 0, 75 Z" Height="50"  Width="100"   Stretch="Fill" Margin="600, 320, 50, 10" Fill="Green" Tag="White">
+                    <Path.Effect>
+                        <DropShadowEffect x:Name="shadowFF" ShadowDepth="5" BlurRadius="10" Color="{Binding ElementName=closeButton, Path=Foreground}" RenderingBias="Performance"/>
+                    </Path.Effect>
+                    <Path.Triggers>
+                        <EventTrigger RoutedEvent="TextBlock.Loaded">
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <DoubleAnimation Storyboard.TargetName="shadowFF"
+                                                 Storyboard.TargetProperty="BlurRadius"                                             
+                                                 To="40" AutoReverse="true" RepeatBehavior="Forever" Duration="0:0:2"/>
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                    </Path.Triggers>
+                </Path>
+            </Grid>
+        </Border>
+
+    </Grid>
+</Page>

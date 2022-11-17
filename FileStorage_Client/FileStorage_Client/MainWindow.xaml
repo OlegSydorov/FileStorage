@@ -1,0 +1,303 @@
+﻿<Window x:Class="FileStorage_Client.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:FileStorage_Client"
+        mc:Ignorable="d"
+         Title="MainWindow" Height="800" Width="1800" WindowStyle="None" ResizeMode="NoResize" WindowStartupLocation="Manual" Background="Transparent" AllowsTransparency="True">
+    <Window.Resources>
+
+        <ControlTemplate x:Key="buttonTemplate" TargetType="{x:Type Button}">
+            <Grid>
+                <Rectangle x:Name="rect1" RadiusX="10" RadiusY="10" Stroke="White" Width="{TemplateBinding Button.Width}" Height="{TemplateBinding Button.Height}" StrokeThickness="2" Fill="{TemplateBinding Background}" >
+
+                    <Rectangle.Effect>
+                        <DropShadowEffect x:Name="shadow1" Opacity="1" BlurRadius="10"  Color="LightGray"/>
+                    </Rectangle.Effect>
+                </Rectangle>
+                <ContentPresenter Margin="{TemplateBinding Button.Padding}" HorizontalAlignment="Center" VerticalAlignment="Center" Content="{TemplateBinding Button.Content}"/>
+            </Grid>
+
+            <ControlTemplate.Triggers>
+
+
+                <Trigger Property="Button.IsPressed" Value="True">
+                    <Setter Property="RenderTransform">
+                        <Setter.Value>
+                            <ScaleTransform ScaleX="0.9" ScaleY="0.9"/>
+                        </Setter.Value>
+                    </Setter>
+                    <Setter Property="RenderTransformOrigin" Value=".5,.5"/>
+
+
+                    <Trigger.EnterActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation Storyboard.TargetName="shadow1"
+                                                 Storyboard.TargetProperty="BlurRadius"
+                                                 To="40" Duration="0:0:0.1"/>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </Trigger.EnterActions>
+
+                    <Trigger.ExitActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation Storyboard.TargetName="shadow1"
+                                                 Storyboard.TargetProperty="BlurRadius"
+                                                 To="10" Duration="0:0:0.1"/>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </Trigger.ExitActions>
+                </Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>
+
+        <Style x:Key="buttonStyle">
+            <Setter Property="Button.FontFamily" Value="Times"/>
+            <Setter Property="Button.FontSize" Value="20"/>
+            <Setter Property="Button.FontWeight" Value="Bold"/>
+            <!--<Setter Property="Button.Foreground" Value="DarkCyan"/>-->
+        </Style>
+
+        <Style x:Key="textBoxStyle">
+            <Setter Property="TextBox.FontFamily" Value="Times" />
+            <Setter Property="TextBox.FontSize" Value="15"/>
+            <Setter Property="TextBox.FontWeight" Value="Bold"/>
+            <Setter Property="TextBox.TextWrapping" Value="Wrap"/>
+            <Setter Property="TextBox.TextAlignment" Value="Center"/>
+            <Setter Property="TextBox.VerticalContentAlignment" Value="Center"/>
+            <Setter Property="TextBox.Opacity" Value="1"/>
+            <!--<Setter Property="TextBox.Foreground" Value="DarkCyan"/>-->
+        </Style>
+
+        <Style x:Key="labelStyle">
+            <Setter Property="Label.FontFamily" Value="Times" />
+            <Setter Property="Label.FontSize" Value="20"/>
+            <Setter Property="Label.FontWeight" Value="Bold"/>
+            <Setter Property="Label.Foreground" Value="DarkCyan"/>
+            <Setter Property="Label.HorizontalContentAlignment" Value="Center"/>
+        </Style>
+
+
+    </Window.Resources>
+    <Grid >
+        <Border x:Name="mainBorder" BorderThickness="8" MouseLeftButtonDown="grid_click" CornerRadius="20" >
+            <Grid x:Name="MainGrid">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="250"/>
+                    <ColumnDefinition Width="1280"/>
+                    <ColumnDefinition Width="250"/>
+                </Grid.ColumnDefinitions>
+
+                <TabControl x:Name="tabSwitch" Grid.Column="1" Margin="5,5,5,5" Background="Transparent" Foreground="DarkCyan" BorderBrush="Transparent" TabStripPlacement="Bottom" >
+                    <TabItem x:Name="BlankTab"  Height="Auto" Width="Auto">
+                        <Grid x:Name="BlankGrid" Background="cyan"/>
+                    </TabItem>
+                    <TabItem x:Name="ViewTab"  Height="Auto" Width="Auto">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="50"/>
+                                <RowDefinition Height="730"/>
+                            </Grid.RowDefinitions>
+
+                            <Label x:Name="viewServerL" Grid.Row="0" Content="S  t  o  r  a  g  e" Margin="200, 5, 200, 5" Style="{StaticResource labelStyle}"/>
+                            <DataGrid Name="ViewDataGrid" Grid.Row="1" Margin="150, 10, 150, 30" Foreground="DarkCyan" FontWeight="Bold" Background="white" HorizontalGridLinesBrush="DarkCyan" CanUserAddRows="False" CanUserDeleteRows="False"  AutoGenerateColumns="False" IsReadOnly="True" SelectionMode="Single" >
+                                <DataGrid.ContextMenu>
+                                    <ContextMenu>
+                                        <MenuItem Header="Delete file" Click="deleteFile_Click"/>
+                                        <MenuItem Header="Delete folder" Click="deleteFolder_Click"/>
+                                        <MenuItem Header="Create folder" Click="createFolder_Click"/>
+                                        <MenuItem Header="Open folder" Click="openFolder_Click"/>
+                                        <MenuItem Header="Cut file" Click="cutFile_Click"/>
+                                        <MenuItem Header="Paste file" Click="pasteFile_Click"/>
+                                    </ContextMenu>
+                                </DataGrid.ContextMenu>
+
+                                <DataGrid.Resources>
+                                    <Style BasedOn="{StaticResource {x:Type DataGridColumnHeader}}" TargetType="{x:Type DataGridColumnHeader}">
+                                        <Setter Property="Background" Value="{Binding ElementName=SkinButton, Path=Foreground}" />
+                                        <Setter Property="Foreground" Value="{Binding ElementName=SkinButton, Path=Background}" />
+                                    </Style>
+                                </DataGrid.Resources>
+
+                                <DataGrid.RowHeaderTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text=">" TextAlignment="Center"/>
+                                    </DataTemplate>
+                                </DataGrid.RowHeaderTemplate>
+                                <DataGrid.Columns>
+                                    <DataGridTemplateColumn Header="File icon" Width="200" >
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Image Source="{Binding Path=Path }" MaxHeight="40"/>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                    <DataGridTextColumn Header="File name" Binding="{Binding Path=Name }" IsReadOnly="True" Width="300" />
+                                    <DataGridTextColumn Header="File type" Binding="{Binding Path=Extension }" IsReadOnly="True" Width="100" />
+                                    <DataGridTextColumn Header="File size" Binding="{Binding Path=Size}"  IsReadOnly="True" Width="100" />
+                                    <DataGridTextColumn Header="Last changed" Binding="{Binding Path=LastChanged}"  IsReadOnly="True" Width="150" />
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </Grid>
+                    </TabItem>
+
+                    <TabItem x:Name="UploadTab"  Height="Auto" Width="Auto">
+                        <Grid Background="Transparent" Margin="1,1,1,1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="635"/>
+                                <ColumnDefinition Width="635"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="50"/>
+                                <RowDefinition Height="620"/>
+                                <RowDefinition Height="100"/>
+                            </Grid.RowDefinitions>
+
+                            <Label x:Name="uploadServerL" Grid.Column="0" Grid.Row="0" Content="S  t  o  r  a  g  e" Margin="200, 5, 200, 5" Style="{StaticResource labelStyle}"/>
+                            <Label x:Name="uploadClientL" Grid.Column="1" Grid.Row="0" Content="T  r  a  y" Margin="200, 5, 200, 5" Style="{StaticResource labelStyle}"/>
+
+                            <DataGrid Name="UploadClientDataGrid" AllowDrop="True"  Grid.Column="1" Grid.Row="1" Margin="10,10,10,10" Foreground="DarkCyan" FontWeight="Bold" Background="white" HorizontalGridLinesBrush="DarkCyan" CanUserAddRows="False" CanUserDeleteRows="False"  AutoGenerateColumns="False" IsReadOnly="True" SelectionMode="Single" DragEnter="uploadClientDragEnter" Drop="uploadClientDrop">
+                                <DataGrid.ContextMenu>
+                                    <ContextMenu>
+                                        <MenuItem Header="Remove from tray" Click="removeFromUploadTray_Click"/>
+                                        <MenuItem Header="Clear tray" Click="clearUploadTray_Click"/>
+                                    </ContextMenu>
+                                </DataGrid.ContextMenu>
+                                <DataGrid.Resources>
+                                    <Style BasedOn="{StaticResource {x:Type DataGridColumnHeader}}" TargetType="{x:Type DataGridColumnHeader}">
+                                        <Setter Property="Background" Value="{Binding ElementName=SkinButton, Path=Foreground}" />
+                                        <Setter Property="Foreground" Value="{Binding ElementName=SkinButton, Path=Background}" />
+                                    </Style>
+                                </DataGrid.Resources>
+                                <DataGrid.RowHeaderTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text=">" TextAlignment="Center"/>
+                                    </DataTemplate>
+                                </DataGrid.RowHeaderTemplate>
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="File name" Binding="{Binding Path=Name }" IsReadOnly="True" Width="300" />
+                                    <DataGridTextColumn Header="File type" Binding="{Binding Path=Extension }" IsReadOnly="True" Width="100" />
+                                    <DataGridTextColumn Header="File size" Binding="{Binding Path=Size}"  IsReadOnly="True" Width="100" />
+                                    <DataGridTextColumn Header="Last changed" Binding="{Binding Path=LastChanged}"  IsReadOnly="True" Width="100" />
+                                </DataGrid.Columns>
+                            </DataGrid>
+
+                            <DataGrid Name="UploadServerDataGrid"  Grid.Column="0" Grid.Row="1" Margin="10,10,10,10" Foreground="DarkCyan" FontWeight="Bold" Background="white" HorizontalGridLinesBrush="DarkCyan" CanUserAddRows="False" CanUserDeleteRows="False"  AutoGenerateColumns="False" IsReadOnly="True" SelectionMode="Single" >
+
+                                <DataGrid.Resources>
+                                    <Style BasedOn="{StaticResource {x:Type DataGridColumnHeader}}" TargetType="{x:Type DataGridColumnHeader}">
+                                        <Setter Property="Background" Value="{Binding ElementName=SkinButton, Path=Foreground}" />
+                                        <Setter Property="Foreground" Value="{Binding ElementName=SkinButton, Path=Background}" />
+                                    </Style>
+                                </DataGrid.Resources>
+                                <DataGrid.RowHeaderTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text=">" TextAlignment="Center"/>
+                                    </DataTemplate>
+                                </DataGrid.RowHeaderTemplate>
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="File name" Binding="{Binding Path=Name }" IsReadOnly="True" Width="300" />
+                                    <DataGridTextColumn Header="File type" Binding="{Binding Path=Extension }" IsReadOnly="True" Width="100" />
+                                    <DataGridTextColumn Header="File size" Binding="{Binding Path=Size}"  IsReadOnly="True" Width="100" />
+                                    <DataGridTextColumn Header="Last changed" Binding="{Binding Path=LastChanged}"  IsReadOnly="True" Width="100" />
+                                </DataGrid.Columns>
+                            </DataGrid>
+
+                            <Button x:Name="uploadButton"  Grid.Column="1" Grid.Row="2" Margin="100,10,100,30" Background="Cyan" Content="Upload selected files to storage" Template="{StaticResource buttonTemplate}" Style="{StaticResource buttonStyle}" Click="uploadButton_Click" Visibility="Visible" />
+
+                        </Grid>
+                    </TabItem>
+
+                    <TabItem x:Name="DownloadTab"  Height="Auto" Width="Auto">
+                        <Grid Background="Transparent" Margin="1,1,1,1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="635"/>
+                                <ColumnDefinition Width="635"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="50"/>
+                                <RowDefinition Height="620"/>
+                                <RowDefinition Height="100"/>
+                            </Grid.RowDefinitions>
+
+                            <Label x:Name="downloadServerL" Grid.Column="0" Grid.Row="0" Content="S  t  o  r  a  g  e" Margin="200, 5, 200, 5" Style="{StaticResource labelStyle}"/>
+                            <Label x:Name="downloadClientL" Grid.Column="1" Grid.Row="0" Content="T  r  a  y" Margin="200, 5, 200, 5" Style="{StaticResource labelStyle}"/>
+
+                            <DataGrid Name="DownloadClientDataGrid" Grid.Column="1" Grid.Row="1" Margin="10,10,10,10" Foreground="DarkCyan" FontWeight="Bold" Background="white" HorizontalGridLinesBrush="DarkCyan" CanUserAddRows="False" CanUserDeleteRows="False"  AutoGenerateColumns="False" IsReadOnly="True" SelectionMode="Single" AllowDrop="True" DragEnter="downloadClientDragEnter" Drop="downloadClientDrop">
+                                <DataGrid.ContextMenu>
+                                    <ContextMenu>
+                                        <MenuItem Header="Remove from tray" Click="removeFromDownloadTray_Click"/>
+                                        <MenuItem Header="Clear tray" Click="clearDownloadTray_Click"/>
+                                    </ContextMenu>
+                                </DataGrid.ContextMenu>
+                                <DataGrid.Resources>
+                                    <Style BasedOn="{StaticResource {x:Type DataGridColumnHeader}}" TargetType="{x:Type DataGridColumnHeader}">
+                                        <Setter Property="Background" Value="{Binding ElementName=SkinButton, Path=Foreground}" />
+                                        <Setter Property="Foreground" Value="{Binding ElementName=SkinButton, Path=Background}" />
+                                    </Style>
+                                </DataGrid.Resources>
+                                <DataGrid.RowHeaderTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text=">" TextAlignment="Center"/>
+                                    </DataTemplate>
+                                </DataGrid.RowHeaderTemplate>
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="File name" Binding="{Binding Path=Name }" IsReadOnly="True" Width="300" />
+                                    <DataGridTextColumn Header="File type" Binding="{Binding Path=Extension }" IsReadOnly="True" Width="100" />
+                                    <DataGridTextColumn Header="File size" Binding="{Binding Path=Size}"  IsReadOnly="True" Width="100" />
+                                    <DataGridTextColumn Header="Last changed" Binding="{Binding Path=LastChanged}"  IsReadOnly="True" Width="100" />
+                                </DataGrid.Columns>
+                            </DataGrid>
+
+                            <DataGrid Name="DownloadServerDataGrid"  Grid.Column="0" Grid.Row="1" Margin="10,10,10,10" Foreground="DarkCyan" FontWeight="Bold" Background="white" HorizontalGridLinesBrush="DarkCyan" CanUserAddRows="False" CanUserDeleteRows="False"  AutoGenerateColumns="False" IsReadOnly="True" SelectionMode="Single" PreviewMouseDown="downloadServerGridPreviewMouseDown">
+                                <DataGrid.ContextMenu>
+                                    <ContextMenu>
+                                        <MenuItem Header="Open folder" Click="openFolderDownloadGrid_Click"/>                                        
+                                    </ContextMenu>
+                                </DataGrid.ContextMenu>
+                                <DataGrid.Resources>
+                                    <Style BasedOn="{StaticResource {x:Type DataGridColumnHeader}}" TargetType="{x:Type DataGridColumnHeader}">
+                                        <Setter Property="Background" Value="{Binding ElementName=SkinButton, Path=Foreground}" />
+                                        <Setter Property="Foreground" Value="{Binding ElementName=SkinButton, Path=Background}" />
+                                    </Style>
+                                </DataGrid.Resources>
+                                <DataGrid.RowHeaderTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text=">" TextAlignment="Center"/>
+                                    </DataTemplate>
+                                </DataGrid.RowHeaderTemplate>
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="File name" Binding="{Binding Path=Name }" IsReadOnly="True" Width="300" />
+                                    <DataGridTextColumn Header="File type" Binding="{Binding Path=Extension }" IsReadOnly="True" Width="100" />
+                                    <DataGridTextColumn Header="File size" Binding="{Binding Path=Size}"  IsReadOnly="True" Width="100" />
+                                    <DataGridTextColumn Header="Last changed" Binding="{Binding Path=LastChanged}"  IsReadOnly="True" Width="100" />
+                                </DataGrid.Columns>
+                            </DataGrid>
+                            <Button x:Name="downloadButton"  Grid.Column="1"  Grid.Row="2" Margin="100,10,100,30" Background="Cyan" Content="Select folder for downloading" Template="{StaticResource buttonTemplate}" Style="{StaticResource buttonStyle}" Click="downloadButton_Click" Visibility="Visible" />
+                        </Grid>
+                    </TabItem>
+                </TabControl>
+
+                <Button x:Name="loginButton" Grid.Column="0" Margin="10, 10, 10, 720" Background="Cyan" Content="Log In" Template="{StaticResource buttonTemplate}" Style="{StaticResource buttonStyle}" Click="LoginButton_Click" />
+                <TextBox x:Name="loginTb" Grid.Column="0" Margin="10, 90, 10, 640" Style="{StaticResource textBoxStyle}" Text="Enter login" PreviewMouseDown="loginTbMouseDown" Visibility="Hidden" />
+                <TextBox x:Name="passwordTb" Grid.Column="0" Margin="10, 160, 10, 560" Style="{StaticResource textBoxStyle}" Text="Enter password" PreviewMouseDown="passwordTbMouseDown" KeyUp="passwordTb_KeyUp" Visibility="Hidden" />
+                <Button x:Name="connectButton" Grid.Column="0" Margin="10, 240, 10, 480" Background="Cyan" Content="Ok" Template="{StaticResource buttonTemplate}" Style="{StaticResource buttonStyle}" Click="ConnectButton_Click" Visibility="Hidden"/>
+                <TextBox x:Name="credentialsTb" Grid.Column="0" Margin="10, 320, 10, 320" Style="{StaticResource textBoxStyle}" Text="You are logged as: ..."  TextWrapping="Wrap" Visibility="Hidden"/>
+
+                <Button x:Name="viewButton" Grid.Column="0" Margin="10, 500, 10, 220" Background="Cyan" Content="View main storage" Template="{StaticResource buttonTemplate}" Style="{StaticResource buttonStyle}" Click="viewButton_Click" Visibility="Hidden"/>
+                <Button x:Name="uploadViewButton"  Grid.Column="0" Margin="10, 580, 10, 140" Background="Cyan" Content="Upload" Template="{StaticResource buttonTemplate}" Style="{StaticResource buttonStyle}" Click="uploadViewButton_Click" Visibility="Hidden"/>
+                <Button x:Name="downloadViewButton" Grid.Column="0" Margin="10, 660, 10, 60" Background="Cyan" Content="Download" Template="{StaticResource buttonTemplate}" Style="{StaticResource buttonStyle}" Click="downloadViewButton_Click" Visibility="Hidden"/>
+
+                <Button x:Name="skinButton" Grid.Column="2" Margin="10, 10, 10, 680" Background="Cyan" Content="Change skin" Template="{StaticResource buttonTemplate}" Style="{StaticResource buttonStyle}" Click="skinButton_Click" Visibility="Visible"/>
+                <Button x:Name="helpButton" Grid.Column="2" Margin="10, 230, 10, 460" Background="Cyan" Content="Help" Template="{StaticResource buttonTemplate}" Style="{StaticResource buttonStyle}" Click="helpButton_Click" Visibility="Visible"/>
+                <Button x:Name="aboutButton" Grid.Column="2" Margin="10, 430, 10, 260" Background="Cyan" Content="About" Template="{StaticResource buttonTemplate}" Style="{StaticResource buttonStyle}" Click="aboutButton_Click" Visibility="Visible"/>
+                <Button x:Name="exitButton" Grid.Column="2" Margin="10, 630, 10, 60" Background="Cyan" Content="Exit" Template="{StaticResource buttonTemplate}" Style="{StaticResource buttonStyle}" Click="exitButton_Click" Visibility="Visible"/>
+            </Grid>
+        </Border>
+    </Grid>
+
+
+</Window>
